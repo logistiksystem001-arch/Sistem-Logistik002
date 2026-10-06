@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logistics Management System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
+          <i data-lucide="truck" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 id="appCompanyName" class="font-bold text-base sm:text-lg text-slate-900 leading-tight">
+            PT LOGISTICS PRIMA NUSANTARA
+          </h1>
+          <p id="appCompanySlogan" class="text-xs text-slate-500">
+            Solusi Cepat, Aman & Terpercaya Manajemen Armada Logistik
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Google Apps Script Live</span>
+        </span>
+        <div class="text-xs text-right hidden sm:block">
+          <div class="font-bold text-slate-800">logistik.system001@gmail.com</div>
+          <div class="text-[10px] text-blue-600 font-semibold">Super Administrator</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <div class="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto p-4 gap-4">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-3 flex lg:flex-col gap-1.5 no-print shadow-xs flex-shrink-0">
+      <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 text-white">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </button>
+      <button onclick="switchTab('plotting')" id="btn-plotting" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">
+        <i data-lucide="map-pin" class="w-4 h-4 text-blue-600"></i> 1. Plotting Armada
+      </button>
+      <button onclick="switchTab('payment')" id="btn-payment" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">
+        <i data-lucide="credit-card" class="w-4 h-4 text-emerald-600"></i> 2. Pengajuan Payment
+      </button>
+      <button onclick="switchTab('keuangan')" id="btn-keuangan" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">
+        <i data-lucide="wallet" class="w-4 h-4 text-purple-600"></i> 3. Buku Kas Keuangan
+      </button>
+      <button onclick="switchTab('ritase')" id="btn-ritase" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">
+        <i data-lucide="truck" class="w-4 h-4 text-amber-600"></i> 4. Master Data Ritase
+      </button>
+      <button onclick="switchTab('settings')" id="btn-settings" class="nav-btn flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100">
+        <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Pengaturan
+      </button>
+    </aside>
+
+    <!-- MAIN PANELS -->
+    <main class="flex-1 space-y-4">
+      <!-- DASHBOARD PANEL -->
+      <section id="panel-dashboard" class="tab-panel space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-black text-slate-900">Dashboard Eksekutif Logistik</h2>
+            <p class="text-xs text-slate-500">Sistem alur otomatis: Plotting ➔ Payment ➔ Kas ➔ Ritase</p>
+          </div>
+          <button onclick="switchTab('plotting')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl">
+            + Buat Plotting Armada
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Total Omset (Fix Rate)</span>
+            <div id="dashFixRate" class="text-xl font-bold text-slate-900 mt-1 font-mono">Rp 0</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Biaya Vendor (Buy Rate)</span>
+            <div id="dashBuyRate" class="text-xl font-bold text-slate-900 mt-1 font-mono">Rp 0</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Gross Profit Margin</span>
+            <div id="dashMargin" class="text-xl font-bold text-emerald-600 mt-1 font-mono">Rp 0</div>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+            <span class="text-xs text-slate-500 font-semibold">Saldo Kas Berjalan</span>
+            <div id="dashSaldoKas" class="text-xl font-bold text-blue-700 mt-1 font-mono">Rp 0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLOTTING PANEL -->
+      <section id="panel-plotting" class="tab-panel hidden space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">1. Plotting Armada Operasional</h2>
+          <button onclick="openPlottingModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl">
+            + Tambah Plotting Baru
+          </button>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+              <tr>
+                <th class="p-3">ID / TGL</th>
+                <th class="p-3">DRIVER & PLAT</th>
+                <th class="p-3">RUTE</th>
+                <th class="p-3 text-right">TAGIHAN (FIX)</th>
+                <th class="p-3 text-right">BIAYA (BUY)</th>
+                <th class="p-3 text-center">STATUS</th>
+                <th class="p-3 text-center">ALUR KERJA</th>
+              </tr>
+            </thead>
+            <tbody id="plottingTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PAYMENT PANEL -->
+      <section id="panel-payment" class="tab-panel hidden space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">2. Pengajuan Payment (Terima Klien & Bayar Vendor)</h2>
+            <p class="text-xs text-slate-500">Tandai baris untuk Download PDF Rekap Pembayaran</p>
+          </div>
+          <button onclick="downloadRekapPdf()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5">
+            <i data-lucide="printer" class="w-4 h-4"></i> Download PDF Rekap Terpilih
+          </button>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+              <tr>
+                <th class="p-3 text-center"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"></th>
+                <th class="p-3">ID / TGL</th>
+                <th class="p-3">DRIVER & PLAT</th>
+                <th class="p-3">RUTE</th>
+                <th class="p-3 text-right">TAGIHAN (FIX)</th>
+                <th class="p-3 text-center">STATUS KLIEN</th>
+                <th class="p-3 text-right">BIAYA (BUY)</th>
+                <th class="p-3 text-center">STATUS VENDOR</th>
+              </tr>
+            </thead>
+            <tbody id="paymentTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- KEUANGAN PANEL -->
+      <section id="panel-keuangan" class="tab-panel hidden space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">3. Buku Kas Keuangan Operasional</h2>
+          <span class="text-xs text-slate-500">Otomatis mencatat arus kas saat payment di-approve</span>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+              <tr>
+                <th class="p-3">ID / TGL</th>
+                <th class="p-3 text-center">ARUS KAS</th>
+                <th class="p-3">KETERANGAN & ASAL DANA</th>
+                <th class="p-3">REF TRANSFER</th>
+                <th class="p-3 text-right">JUMLAH</th>
+                <th class="p-3 text-right">SALDO BERJALAN</th>
+              </tr>
+            </thead>
+            <tbody id="keuanganTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RITASE PANEL -->
+      <section id="panel-ritase" class="tab-panel hidden space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">4. Master Data Ritase Terpadu</h2>
+          <span class="text-xs text-slate-500">Status sinkron otomatis dengan payment</span>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+              <tr>
+                <th class="p-3">ID / TGL</th>
+                <th class="p-3">DRIVER & PLAT</th>
+                <th class="p-3">RUTE</th>
+                <th class="p-3 text-right">TAGIHAN (FIX)</th>
+                <th class="p-3 text-right">BIAYA (BUY)</th>
+                <th class="p-3 text-right text-emerald-600">MARGIN</th>
+                <th class="p-3 text-center">STATUS KLIEN</th>
+                <th class="p-3 text-center">STATUS VENDOR</th>
+              </tr>
+            </thead>
+            <tbody id="ritaseTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SETTINGS PANEL -->
+      <section id="panel-settings" class="tab-panel hidden space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+          <h2 class="text-base font-bold text-slate-900">Pengaturan Identitas Perusahaan & Pejabat Penanda Tangan</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">Nama Perusahaan:</label>
+              <input type="text" id="cfgCompanyName" class="w-full p-2 border border-slate-300 rounded-lg text-slate-900 font-bold" value="PT LOGISTICS PRIMA NUSANTARA">
+            </div>
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">Slogan Perusahaan:</label>
+              <input type="text" id="cfgCompanySlogan" class="w-full p-2 border border-slate-300 rounded-lg text-slate-900" value="Solusi Cepat, Aman & Terpercaya Manajemen Armada Logistik">
+            </div>
+          </div>
+          <button onclick="saveSettings()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl">
+            Simpan Perubahan
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- SCRIPT LOGIC (COMPATIBLE WITH GOOGLE APPS SCRIPT) -->
+  <script>
+    // State in memory
+    let dataPlotting = [];
+    let dataPayment = [];
+    let dataKeuangan = [];
+    let dataRitase = [];
+    let selectedPayments = [];
+
+    function init() {
+      lucide.createIcons();
+      loadData();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('text-slate-700');
+      });
+
+      const activePanel = document.getElementById('panel-' + tabId);
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activePanel) activePanel.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.add('bg-blue-600', 'text-white');
+        activeBtn.classList.remove('text-slate-700');
+      }
+      lucide.createIcons();
+    }
+
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    // Load Data directly from Apps Script backend if running inside GAS, or fallback to mock
+    function loadData() {
+      // Default initial mock if spreadsheet is still empty
+      dataPlotting = [
+        { id: 'PLT-202610-001', date: '2026-10-06', driver: 'Budi Santoso', plat: 'B 9283 JKL', rute: 'Jakarta - Surabaya', fixRate: 4800000, buyRate: 4100000, status: 'ON THE ROAD' },
+        { id: 'PLT-202610-002', date: '2026-10-06', driver: 'Hendra Gunawan', plat: 'L 8412 UZ', rute: 'Surabaya - Jakarta', fixRate: 8500000, buyRate: 7200000, status: 'PLANNED' }
+      ];
+      dataPayment = [
+        { id: 'PAY-202610-001', date: '2026-10-06', driver: 'Budi Santoso', noPlat: 'B 9283 JKL', rute: 'Jakarta - Surabaya', fixRate: 4800000, buyRate: 4100000, statusFixRate: 'APPROVED', refNoFix: 'TRF-BCA-8891', statusBuyRate: 'APPROVE', refNoBuy: 'TRF-MDR-4412' },
+        { id: 'PAY-202610-002', date: '2026-10-06', driver: 'Hendra Gunawan', noPlat: 'L 8412 UZ', rute: 'Surabaya - Jakarta', fixRate: 8500000, buyRate: 7200000, statusFixRate: 'DRAFT', refNoFix: '', statusBuyRate: 'DRAFT', refNoBuy: '' }
+      ];
+      dataKeuangan = [
+        { id: 'KAS-001', tanggal: '2026-10-06', tipe: 'PEMASUKAN', keterangan: 'Pelunasan Tagihan Klien (Fix Rate B 9283 JKL)', refNo: 'TRF-BCA-8891', jumlah: 4800000, total: 4800000 },
+        { id: 'KAS-002', tanggal: '2026-10-06', tipe: 'PENGELUARAN', keterangan: 'Pembayaran Vendor (Buy Rate B 9283 JKL)', refNo: 'TRF-MDR-4412', jumlah: 4100000, total: 700000 }
+      ];
+      dataRitase = [
+        { id: 'RIT-202610-001', date: '2026-10-06', driver: 'Budi Santoso', plat: 'B 9283 JKL', origin: 'Jakarta - Surabaya', fixRate: 4800000, buyRate: 4100000, margin: 700000, statusFix: 'APPROVED', statusBuy: 'APPROVE' },
+        { id: 'RIT-202610-002', date: '2026-10-06', driver: 'Hendra Gunawan', plat: 'L 8412 UZ', origin: 'Surabaya - Jakarta', fixRate: 8500000, buyRate: 7200000, margin: 1300000, statusFix: 'DRAFT', statusBuy: 'DRAFT' }
+      ];
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              if (res.plotting && res.plotting.length) dataPlotting = res.plotting;
+              if (res.payment && res.payment.length) dataPayment = res.payment;
+              if (res.keuangan && res.keuangan.length) dataKeuangan = res.keuangan;
+              if (res.ritase && res.ritase.length) dataRitase = res.ritase;
+            }
+            renderAll();
+          })
+          .withFailureHandler(function(err) {
+            console.error("Gagal sinkron data Apps Script:", err);
+            renderAll();
+          })
+          .getInitialAppData();
+      } else {
+        renderAll();
+      }
+    }
+
+    function renderAll() {
+      // 1. Render Dashboard
+      const totFix = dataRitase.reduce((a, b) => a + (b.fixRate || 0), 0);
+      const totBuy = dataRitase.reduce((a, b) => a + (b.buyRate || 0), 0);
+      document.getElementById('dashFixRate').innerText = formatRupiah(totFix);
+      document.getElementById('dashBuyRate').innerText = formatRupiah(totBuy);
+      document.getElementById('dashMargin').innerText = formatRupiah(totFix - totBuy);
+      const saldo = dataKeuangan.length > 0 ? dataKeuangan[dataKeuangan.length - 1].total : 0;
+      document.getElementById('dashSaldoKas').innerText = formatRupiah(saldo);
+
+      // 2. Render Plotting
+      const pBody = document.getElementById('plottingTableBody');
+      pBody.innerHTML = dataPlotting.map(p => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-mono font-bold text-blue-700">${p.id}<div class="text-[10px] text-slate-400 font-normal">${p.date}</div></td>
+          <td class="p-3 font-semibold text-slate-900">${p.driver}<div class="text-[10px] font-mono text-slate-500">${p.plat}</div></td>
+          <td class="p-3 text-slate-700">${p.rute}</td>
+          <td class="p-3 text-right font-mono text-blue-700 font-bold">${formatRupiah(p.fixRate)}</td>
+          <td class="p-3 text-right font-mono text-slate-800 font-bold">${formatRupiah(p.buyRate)}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">${p.status}</span></td>
+          <td class="p-3 text-center">
+            <button onclick="switchTab('payment')" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-bold hover:bg-blue-100">
+              Lihat di Payment ➔
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 3. Render Payment
+      const payBody = document.getElementById('paymentTableBody');
+      payBody.innerHTML = dataPayment.map(item => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 text-center"><input type="checkbox" class="pay-check" value="${item.id}" onchange="updateSelected()"></td>
+          <td class="p-3 font-mono font-bold text-blue-700">${item.id}<div class="text-[10px] text-slate-400 font-normal">${item.date}</div></td>
+          <td class="p-3 font-semibold text-slate-900">${item.driver}<div class="text-[10px] font-mono text-slate-500">${item.noPlat}</div></td>
+          <td class="p-3 text-slate-700">${item.rute}</td>
+          <td class="p-3 text-right font-mono font-bold text-blue-700">
+            ${formatRupiah(item.fixRate)}
+            ${item.refNoFix ? '<div class="text-[9px] text-emerald-700">Ref: ' + item.refNoFix + '</div>' : ''}
+          </td>
+          <td class="p-3 text-center">
+            ${item.statusFixRate === 'APPROVED' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">APPROVED</span>' :
+            `<button onclick="approveFix('${item.id}')" class="px-2 py-1 bg-amber-100 text-amber-800 hover:bg-emerald-600 hover:text-white rounded text-[10px] font-bold">Approve Tagihan</button>`}
+          </td>
+          <td class="p-3 text-right font-mono font-bold text-slate-900">
+            ${formatRupiah(item.buyRate)}
+            ${item.refNoBuy ? '<div class="text-[9px] text-blue-700">Ref: ' + item.refNoBuy + '</div>' : ''}
+          </td>
+          <td class="p-3 text-center">
+            ${item.statusBuyRate === 'APPROVE' ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">APPROVE</span>' :
+            `<button onclick="approveBuy('${item.id}')" class="px-2 py-1 bg-blue-100 text-blue-800 hover:bg-emerald-600 hover:text-white rounded text-[10px] font-bold">Approve Bayar</button>`}
+          </td>
+        </tr>
+      `).join('');
+
+      // 4. Render Keuangan
+      const kBody = document.getElementById('keuanganTableBody');
+      kBody.innerHTML = dataKeuangan.map(k => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-mono font-bold text-blue-700">${k.id}<div class="text-[10px] text-slate-400 font-normal">${k.tanggal}</div></td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${k.tipe === 'PEMASUKAN' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${k.tipe}</span></td>
+          <td class="p-3 font-semibold text-slate-900">${k.keterangan}</td>
+          <td class="p-3 font-mono text-[11px] text-blue-700">${k.refNo || '-'}</td>
+          <td class="p-3 text-right font-mono font-bold ${k.tipe === 'PEMASUKAN' ? 'text-emerald-700' : 'text-rose-700'}">${k.tipe === 'PEMASUKAN' ? '+' : '-'}${formatRupiah(k.jumlah)}</td>
+          <td class="p-3 text-right font-mono font-bold text-slate-900">${formatRupiah(k.total)}</td>
+        </tr>
+      `).join('');
+
+      // 5. Render Ritase
+      const rBody = document.getElementById('ritaseTableBody');
+      rBody.innerHTML = dataRitase.map(r => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-mono font-bold text-blue-700">${r.id}</td>
+          <td class="p-3 font-semibold text-slate-900">${r.driver} (${r.plat})</td>
+          <td class="p-3 text-slate-700">${r.origin}</td>
+          <td class="p-3 text-right font-mono font-bold text-blue-700">${formatRupiah(r.fixRate)}</td>
+          <td class="p-3 text-right font-mono font-bold text-slate-900">${formatRupiah(r.buyRate)}</td>
+          <td class="p-3 text-right font-mono font-bold text-emerald-600">+${formatRupiah(r.margin)}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.statusFix === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">${r.statusFix}</span></td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.statusBuy === 'APPROVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">${r.statusBuy}</span></td>
+        </tr>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function approveFix(id) {
+      const ref = prompt("Masukkan Nomor Referensi Transfer / Bukti Bank Tagihan Klien (Wajib):", "TRF-BCA-" + Math.floor(Math.random() * 90000 + 10000));
+      if (!ref) { alert("Nomor referensi transfer wajib diisi!"); return; }
+      
+      const item = dataPayment.find(p => p.id === id);
+      if (item) {
+        item.statusFixRate = 'APPROVED';
+        item.refNoFix = ref;
+        // Auto masuk ke Buku Kas Keuangan
+        const saldoLama = dataKeuangan.length > 0 ? dataKeuangan[dataKeuangan.length - 1].total : 0;
+        dataKeuangan.push({
+          id: 'KAS-' + Date.now().toString().slice(-4),
+          tanggal: new Date().toISOString().split('T')[0],
+          tipe: 'PEMASUKAN',
+          keterangan: 'Pemasukan Fix Rate Ritase ' + item.noPlat + ' (' + item.driver + ')',
+          refNo: ref,
+          jumlah: item.fixRate,
+          total: saldoLama + item.fixRate
+        });
+        // Sync ritase
+        const r = dataRitase.find(x => x.id.includes(id.replace('PAY-', '')));
+        if (r) r.statusFix = 'APPROVED';
+        renderAll();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.withSuccessHandler(function() {
+            console.log("Sync tagihan klien ke Sheets sukses!");
+          }).approveFixRate(id, ref);
+        }
+
+        alert("Tagihan Klien Disetujui (Ref: " + ref + ") & Otomatis Tercatat di Buku Kas!");
+      }
+    }
+
+    function approveBuy(id) {
+      const ref = prompt("Masukkan Nomor Referensi Transfer Pembayaran Vendor (Wajib):", "TRF-MDR-" + Math.floor(Math.random() * 90000 + 10000));
+      if (!ref) { alert("Nomor referensi transfer wajib diisi!"); return; }
+      
+      const item = dataPayment.find(p => p.id === id);
+      if (item) {
+        item.statusBuyRate = 'APPROVE';
+        item.refNoBuy = ref;
+        // Auto masuk ke Buku Kas Keuangan (Pengeluaran)
+        const saldoLama = dataKeuangan.length > 0 ? dataKeuangan[dataKeuangan.length - 1].total : 0;
+        dataKeuangan.push({
+          id: 'KAS-' + Date.now().toString().slice(-4),
+          tanggal: new Date().toISOString().split('T')[0],
+          tipe: 'PENGELUARAN',
+          keterangan: 'Pengeluaran Buy Rate Vendor (' + item.driver + ' - ' + item.noPlat + ')',
+          refNo: ref,
+          jumlah: item.buyRate,
+          total: saldoLama - item.buyRate
+        });
+        // Sync ritase
+        const r = dataRitase.find(x => x.id.includes(id.replace('PAY-', '')));
+        if (r) r.statusBuy = 'APPROVE';
+        renderAll();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.withSuccessHandler(function() {
+            console.log("Sync bayar vendor ke Sheets sukses!");
+          }).approveBuyRate(id, ref);
+        }
+
+        alert("Pembayaran Vendor Disetujui (Ref: " + ref + ") & Otomatis Tercatat di Buku Kas!");
+      }
+    }
+
+    function toggleSelectAll(master) {
+      document.querySelectorAll('.pay-check').forEach(c => c.checked = master.checked);
+      updateSelected();
+    }
+
+    function updateSelected() {
+      selectedPayments = Array.from(document.querySelectorAll('.pay-check:checked')).map(c => c.value);
+    }
+
+    function downloadRekapPdf() {
+      updateSelected();
+      if (selectedPayments.length === 0) {
+        alert("Tandai (checklist) setidaknya 1 baris payment untuk mencetak rekap PDF!");
+        return;
+      }
+      window.print();
+    }
+
+    function saveSettings() {
+      const name = document.getElementById('cfgCompanyName').value;
+      const slogan = document.getElementById('cfgCompanySlogan').value;
+      document.getElementById('appCompanyName').innerText = name;
+      document.getElementById('appCompanySlogan').innerText = slogan;
+      alert("Identitas perusahaan berhasil diperbarui!");
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
